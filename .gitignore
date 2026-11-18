@@ -1,0 +1,7 @@
+*.nimble
+nimcache/
+file_searcher
+dist/
+*.o
+.DS_Store
+.env

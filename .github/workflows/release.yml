@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nim
+        run: |
+          curl -s https://nim-lang.org/choosenim/init.sh -sSf | sh -s - -y
+          echo "$HOME/.nimble/bin" >> "$GITHUB_PATH"
+
+      - name: Build
+        run: make build
+
+      - name: Create source artifact
+        run: make release
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            dist/*.tar.gz \
+            --title "shae-nim-file-searcher ${{ github.ref_name }}" \
+            --generate-notes
